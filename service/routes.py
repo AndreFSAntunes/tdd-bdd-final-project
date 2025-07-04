@@ -106,10 +106,36 @@ def create_products():
 # R E A D   A   P R O D U C T
 ######################################################################
 
-#
-# PLACE YOUR CODE HERE TO READ A PRODUCT
-#
+@app.route("/products/<product_id>", methods=["GET"])
+def get_product(product_id):
+    """
+    Reads a Product
+    This endpoint will return a product in json format if found.
+    """
+    found = Product.find(product_id)
+    if not found:
+        return abort(
+            status.HTTP_404_NOT_FOUND ,
+            f"There is no product with id {product_id}",
+        )
+    return found.serialize(), status.HTTP_200_OK 
 
+@app.route("/products/<product_id>", methods=["PUT"])
+def update_product(product_id):
+    """
+    Reads a Product
+    This endpoint will return a product in json format if found.
+    """
+    found = Product.find(product_id)
+    if not found:
+        return abort(
+            status.HTTP_404_NOT_FOUND ,
+            f"There is no product with id {product_id}",
+        )
+
+    // TODO copy json to found and update
+    
+    return found.serialize(), status.HTTP_200_OK
 ######################################################################
 # U P D A T E   A   P R O D U C T
 ######################################################################
