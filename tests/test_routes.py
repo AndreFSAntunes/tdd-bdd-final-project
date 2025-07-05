@@ -184,7 +184,7 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_update_product(self):
-        """It should reupdatead a product"""
+        """It should updatead a product"""
         test_product = self._create_products()[0]
         test_product.name = "update name"
         response = self.client.put(
@@ -197,6 +197,14 @@ class TestProductRoutes(TestCase):
         except ValueError:
             assert False, "Response is not valid JSON"
         self.assertEqual(data["name"], test_product.name)
+
+    def test_update_product_not_found(self):
+        """It should try to get a inexistent product and return not found"""
+        response = self.client.put(
+            f"{BASE_URL}/{0}",
+            json={}
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     ######################################################################
     # Utility functions

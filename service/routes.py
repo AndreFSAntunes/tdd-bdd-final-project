@@ -120,12 +120,18 @@ def get_product(product_id):
         )
     return found.serialize(), status.HTTP_200_OK 
 
+######################################################################
+# U P D A T E   A   P R O D U C T
+######################################################################
+
 @app.route("/products/<product_id>", methods=["PUT"])
 def update_product(product_id):
     """
-    Reads a Product
-    This endpoint will return a product in json format if found.
+    Updates a Product
+    This endpoint will updates a product.
     """
+    check_content_type("application/json")
+
     found = Product.find(product_id)
     if not found:
         return abort(
@@ -133,16 +139,13 @@ def update_product(product_id):
             f"There is no product with id {product_id}",
         )
 
-    // TODO copy json to found and update
+    data = request.get_json()
+
+    found.deserialize(request.get_json())
+    found.id = product_id
+    found.update()
     
     return found.serialize(), status.HTTP_200_OK
-######################################################################
-# U P D A T E   A   P R O D U C T
-######################################################################
-
-#
-# PLACE YOUR CODE TO UPDATE A PRODUCT HERE
-#
 
 ######################################################################
 # D E L E T E   A   P R O D U C T
