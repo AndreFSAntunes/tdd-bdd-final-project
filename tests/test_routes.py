@@ -179,11 +179,6 @@ class TestProductRoutes(TestCase):
             assert False, "Response is not valid JSON"
         self.assertEqual(data["name"], test_product.name)
 
-    def test_get_product_not_found(self):
-        """It should try to get a inexistent product and return not found"""
-        response = self.client.get(f"{BASE_URL}/{0}")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_update_product(self):
         """It should updatead a product"""
         test_product = self._create_products()[0]
@@ -199,13 +194,35 @@ class TestProductRoutes(TestCase):
             assert False, "Response is not valid JSON"
         self.assertEqual(data["name"], test_product.name)
 
-    def test_update_product_not_found(self):
-        """It should try to get a inexistent product and return not found"""
-        response = self.client.put(
-            f"{BASE_URL}/{0}",
-            json={}
-        )
+    def test_delete_product(self):
+        """It should delete a product"""
+        test_products = self._create_products(5)
+        # uncomment after list all
+        # self.assertEqual(len(test_products), self.get_product_count())
+
+        response = self.client.delete(f"{BASE_URL}/{test_products[0].id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+
+        response = self.client.get(f"{BASE_URL}/{test_products[0].id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        # self.assertEqual(len(test_products)-1, self.get_product_count())
+
+    def test_product_not_found(self):
+        """It should return 404 for get, put, and delete on inexistent product"""
+        endpoints = [
+            ("GET", self.client.get, {}),
+            ("PUT", self.client.put, {"json": {}}),
+            ("DELETE", self.client.delete, {"json": {}})
+        ]
+        for method, func, kwargs in endpoints:
+            with self.subTest(method=method):
+                response = func(f"{BASE_URL}/0", **kwargs)
+                self.assertEqual(
+                    response.status_code,
+                    status.HTTP_404_NOT_FOUND,
+                    f"{method} did not return 404 for inexistent product"
+                )
 
     ######################################################################
     # Utility functions

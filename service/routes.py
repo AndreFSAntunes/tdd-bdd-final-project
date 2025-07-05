@@ -151,7 +151,19 @@ def update_product(product_id):
 # D E L E T E   A   P R O D U C T
 ######################################################################
 
+@app.route("/products/<product_id>", methods=["DELETE"])
+def delete_product(product_id):
+    """
+    Deletes a Product
+    This endpoint will deletes a product.
+    """
+    found = Product.find(product_id)
+    if not found:
+        return abort(
+            status.HTTP_404_NOT_FOUND ,
+            f"There is no product with id {product_id}",
+        )
+    
+    found.delete()
 
-#
-# PLACE YOUR CODE TO DELETE A PRODUCT HERE
-#
+    return "", status.HTTP_204_NO_CONTENT
