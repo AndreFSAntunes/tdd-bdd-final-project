@@ -98,9 +98,14 @@ def create_products():
 # L I S T   A L L   P R O D U C T S
 ######################################################################
 
-#
-# PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
-#
+@app.route("/products", methods=["GET"])
+def list_products():
+    """
+    List all Products
+    This endpoint will return a list of products in json format.
+    """
+    product_list = Product.all()
+    return jsonify([p.serialize() for p in product_list]), status.HTTP_200_OK
 
 ######################################################################
 # R E A D   A   P R O D U C T

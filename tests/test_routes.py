@@ -168,6 +168,7 @@ class TestProductRoutes(TestCase):
     # ADD YOUR TEST CASES HERE
     #
 
+    # READ
     def test_get_product(self):
         """It should read a product"""
         test_product = self._create_products()[0]
@@ -179,6 +180,7 @@ class TestProductRoutes(TestCase):
             assert False, "Response is not valid JSON"
         self.assertEqual(data["name"], test_product.name)
 
+    # UPDATE
     def test_update_product(self):
         """It should updatead a product"""
         test_product = self._create_products()[0]
@@ -194,11 +196,11 @@ class TestProductRoutes(TestCase):
             assert False, "Response is not valid JSON"
         self.assertEqual(data["name"], test_product.name)
 
+    # DELETE
     def test_delete_product(self):
         """It should delete a product"""
         test_products = self._create_products(5)
-        # uncomment after list all
-        # self.assertEqual(len(test_products), self.get_product_count())
+        self.assertEqual(len(test_products), self.get_product_count())
 
         response = self.client.delete(f"{BASE_URL}/{test_products[0].id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -206,8 +208,9 @@ class TestProductRoutes(TestCase):
 
         response = self.client.get(f"{BASE_URL}/{test_products[0].id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        # self.assertEqual(len(test_products)-1, self.get_product_count())
+        self.assertEqual(len(test_products)-1, self.get_product_count())
 
+    # NOT FOUND
     def test_product_not_found(self):
         """It should return 404 for get, put, and delete on inexistent product"""
         endpoints = [
@@ -223,6 +226,18 @@ class TestProductRoutes(TestCase):
                     status.HTTP_404_NOT_FOUND,
                     f"{method} did not return 404 for inexistent product"
                 )
+
+    # LIST ALL
+    def test_list_all_products(self):
+        """It should list all products"""
+        test_products = self._create_products(10)
+        response = self.client.get(f"{BASE_URL}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        try:
+            data = response.get_json()
+        except ValueError:
+            assert False, "Response is not valid JSON"
+        self.assertEqual(len(data), len(test_products))
 
     ######################################################################
     # Utility functions
