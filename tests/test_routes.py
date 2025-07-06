@@ -28,6 +28,7 @@ import os
 import logging
 from decimal import Decimal
 from unittest import TestCase
+from urllib.parse import quote_plus
 from service import app
 from service.common import status
 from service.models import db, init_db, Product
@@ -120,7 +121,7 @@ class TestProductRoutes(TestCase):
 
         # Make sure location header is set
         location = response.headers.get("Location", None)
-        logging.debug(f"Location: {location}")
+        logging.debug("Location: {%s}", location)
         self.assertIsNotNone(location)
 
         # Check the data is correct
@@ -238,6 +239,60 @@ class TestProductRoutes(TestCase):
         except ValueError:
             assert False, "Response is not valid JSON"
         self.assertEqual(len(data), len(test_products))
+
+    # LIST BY NAME
+    def test_list_by_name(self):
+        """It should list products by name"""
+        test_products = self._create_products(10)
+        name = test_products[0].name
+        products_name = [product for product in test_products if product.name == name]
+        count_name = len(products_name)
+
+        response = self.client.get(f"{BASE_URL}", query_string=f"name={quote_plus(name)}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        try:
+            data = response.get_json()
+        except ValueError:
+            assert False, "Response is not valid JSON"
+        self.assertEqual(len(data), count_name)
+        for product in data:
+            self.assertEqual(product["name"], name)
+
+    # LIST BY CATEGORY
+    def test_list_by_category(self):
+        """It should list products by category"""
+        test_products = self._create_products(10)
+        category = test_products[0].category
+        products_category = [product for product in test_products if product.category == category]
+        count_category = len(products_category)
+
+        response = self.client.get(f"{BASE_URL}", query_string=f"category={category.name}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        try:
+            data = response.get_json()
+        except ValueError:
+            assert False, "Response is not valid JSON"
+        self.assertEqual(len(data), count_category)
+        for product in data:
+            self.assertEqual(product["category"], category.name)
+
+    # LIST BY AVAILABILITY
+    def test_list_by_available(self):
+        """It should list products by availability"""
+        test_products = self._create_products(10)
+        available = test_products[0].available
+        products_available = [product for product in test_products if product.available == available]
+        count_available = len(products_available)
+
+        response = self.client.get(f"{BASE_URL}", query_string=f"available={available}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        try:
+            data = response.get_json()
+        except ValueError:
+            assert False, "Response is not valid JSON"
+        self.assertEqual(len(data), count_available)
+        for product in data:
+            self.assertEqual(product["available"], available)
 
     ######################################################################
     # Utility functions

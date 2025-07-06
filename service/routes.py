@@ -20,7 +20,7 @@ Product Store Service with UI
 """
 from flask import jsonify, request, abort
 from flask import url_for  # noqa: F401 pylint: disable=unused-import
-from service.models import Product
+from service.models import Product, Category
 from service.common import status  # HTTP Status Codes
 from . import app
 
@@ -104,12 +104,25 @@ def list_products():
     List all Products
     This endpoint will return a list of products in json format.
     """
-    product_list = Product.all()
+    product_list = []
+    name = request.args.get("name")
+    category = request.args.get("category")
+    available = request.args.get("available")
+    if name:
+        product_list = Product.find_by_name(name)
+    elif category:
+        category_value = Category[category.upper()]
+        product_list = Product.find_by_category(category_value)
+    elif available:
+        product_list = Product.find_by_availability(available)
+    else:
+        product_list = Product.all()
     return jsonify([p.serialize() for p in product_list]), status.HTTP_200_OK
 
 ######################################################################
 # R E A D   A   P R O D U C T
 ######################################################################
+
 
 @app.route("/products/<product_id>", methods=["GET"])
 def get_product(product_id):
@@ -120,14 +133,15 @@ def get_product(product_id):
     found = Product.find(product_id)
     if not found:
         return abort(
-            status.HTTP_404_NOT_FOUND ,
+            status.HTTP_404_NOT_FOUND,
             f"There is no product with id {product_id}",
         )
-    return found.serialize(), status.HTTP_200_OK 
+    return found.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # U P D A T E   A   P R O D U C T
 ######################################################################
+
 
 @app.route("/products/<product_id>", methods=["PUT"])
 def update_product(product_id):
@@ -140,21 +154,20 @@ def update_product(product_id):
     found = Product.find(product_id)
     if not found:
         return abort(
-            status.HTTP_404_NOT_FOUND ,
+            status.HTTP_404_NOT_FOUND,
             f"There is no product with id {product_id}",
         )
-
-    data = request.get_json()
 
     found.deserialize(request.get_json())
     found.id = product_id
     found.update()
-    
+
     return found.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # D E L E T E   A   P R O D U C T
 ######################################################################
+
 
 @app.route("/products/<product_id>", methods=["DELETE"])
 def delete_product(product_id):
@@ -165,10 +178,10 @@ def delete_product(product_id):
     found = Product.find(product_id)
     if not found:
         return abort(
-            status.HTTP_404_NOT_FOUND ,
+            status.HTTP_404_NOT_FOUND,
             f"There is no product with id {product_id}",
         )
-    
+
     found.delete()
 
     return "", status.HTTP_204_NO_CONTENT
