@@ -40,20 +40,20 @@ Scenario: Create a Product
     And I should see "34.95" in the "Price" field
 
 Scenario: Read a Product
-    When i visit the "Home Page"
+    When I visit the "Home Page"
     And I set the "Name" to "Hat"
-    And i press the "Search" button
-    Then i should see the message "Sucess"
-    When i copy the "Id" field
-    And press the "Clear" button
-    And paste the "Id" field
-    And press the "Retrieve" button
-    Then i should see the message "Success"
-    And i should see “Hat” in the “Name” field
-    And i should see “A red fedora” in the “Description” field
-    And i should see “True” in the “Available” dropdown
-    And i should see “Cloths” in the “Category” dropdown
-    And i should see “59.95” in the “Price” field
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the "Name" field
+    And I should see "A red fedora" in the "Description" field
+    And I should see "True" in the "Available" dropdown
+    And I should see "Cloths" in the "Category" dropdown
+    And I should see "59.95" in the "Price" field
 
 Scenario: Update a Product
     When I visit the "Home Page"
@@ -87,7 +87,8 @@ Scenario: Delete a Product
     Then I should not see "Big Mac" in the results
 
 Scenario: List All Products
-    When I press the "Clear" button to remove the previous entries made
+    When I visit the "Home Page"
+    And I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "Hat" in the results
@@ -96,8 +97,9 @@ Scenario: List All Products
     And I should see "Sheets" in the results
 
 Scenario: Search Products by Category
-    When I clear the page
-    And I select "CLOTHS" in the "Category" dropdown
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I select "Cloths" in the "Category" dropdown
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "Hat" in the results
@@ -106,7 +108,9 @@ Scenario: Search Products by Category
     And I should not see "Sheets" in the results
 
 Scenario: Search Products by Availability
-    When I set the "Available" dropdown to "True"
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I select "True" in the "Available" dropdown
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "Hat" in the results
@@ -115,7 +119,9 @@ Scenario: Search Products by Availability
     And I should not see "Shoes" in the results
 
 Scenario: Search a Product by Name
-    When I set the "Name" to "Shoes"
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I set the "Name" to "Shoes"
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "Shoes" in the results
